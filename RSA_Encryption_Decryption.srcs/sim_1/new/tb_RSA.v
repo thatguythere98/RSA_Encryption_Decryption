@@ -1,98 +1,105 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company:
-// Engineer:
+// Company:       [Your Company Name]
+// Engineer:      [Your Name]
 //
-// Create Date: 10/08/2024 09:53:15 PM
-// Design Name:
-// Module Name: tb_RSA
-// Project Name:
-// Target Devices:
-// Tool Versions:
-// Description:
+// Create Date:   10/08/2024 09:53:15 PM
+// Design Name:   RSA Encryption/Decryption Testbench
+// Module Name:   tb_RSA
+// Project Name:  RSA Encryption/Decryption System
+// Target Devices: [Specify Target Device, e.g., FPGA, ASIC]
+// Tool Versions: [Specify Tool Version, e.g., Vivado 2024.1]
+// Description:   Testbench for simulating the RSA encryption and decryption
+//                operations using an RSA module. It tests both encryption
+//                (encoding) and decryption (decoding) using different keys
+//                and message values.
 //
-// Dependencies:
+// Dependencies:  rsa_module (Unit Under Test)
 //
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
+// - The clock signal is generated with a period of 10ns.
+// - Reset is applied at the beginning of both encryption and decryption tests.
+// - Results are displayed using $display for verification of output.
 //
 //////////////////////////////////////////////////////////////////////////////////
 
 module tb_RSA();
-  reg clk,rst;
-  reg start;
-  reg [15:0] private_key, public_key, message_val;
-  wire Cal_done;
-  wire [15:0]Cal_val;
 
+  // Declare testbench signals
+  reg clk, rst;                           // Clock and reset signals
+  reg start;                              // Start signal to initiate RSA process
+  reg [15:0] private_key, public_key, message_val; // Input key and message signals
+  wire Cal_done;                          // Done signal indicating process completion
+  wire [15:0] Cal_val;                    // Output value after RSA operation
 
-  rsa_module dut(private_key, public_key, message_val, clk, start, rst, Cal_done, Cal_val);
+  // Instantiate the DUT (Device Under Test)
+  rsa_module dut(
+               .private_key(private_key),
+               .public_key(public_key),
+               .message_val(message_val),
+               .clk(clk),
+               .start(start),
+               .rst(rst),
+               .Cal_done(Cal_done),
+               .Cal_val(Cal_val)
+             );
 
-
+  // Clock generation: toggles every 5ns
   always
     #5  clk =  !clk;
 
-
+  // Initial block to simulate encryption and decryption tests
   initial
   begin
-    //encrypt
-    private_key = 16'd3;
-    public_key = 16'd33;
-    message_val = 16'd9;
+    // Test encryption process
+    private_key = 16'd3;          // Set private key for encryption
+    public_key = 16'd33;          // Set public key
+    message_val = 16'd9;          // Set message to encrypt
 
+    clk = 1'b0;                   // Initialize clock
+    rst = 1'b1;                   // Assert reset
 
+    #20 rst = 1'b0;               // De-assert reset after 20ns
 
-    clk=1'b0;
-    rst=1'b1;
+    start = 1'b1;                 // Start encryption process
+    #10 start = 1'b0;             // De-assert start after 10ns
 
+    #1500;                        // Wait for encryption process to complete
+    $display("Encoding...");      // Display message indicating encoding
+    $display("Input private key = %d", private_key);  // Display input private key
+    $display("Input public key = %d", public_key);    // Display input public key
+    $display("Input message value = %d", message_val); // Display input message
+    $display("Encrypted output value = %d\n\n", Cal_val); // Display encrypted output
 
-    #20 rst=1'b0;
+    // Test decryption process
+    private_key = 16'd7;          // Set private key for decryption
+    public_key = 16'd33;          // Set public key
+    message_val = 16'd3;          // Set message to decrypt
 
+    clk = 1'b0;                   // Reinitialize clock
+    rst = 1'b1;                   // Assert reset
 
-    start = 1'b1;
-    #10 start = 1'b0;
+    #20 rst = 1'b0;               // De-assert reset after 20ns
 
-    #1500
-     $display("Encoding...");
-    $display("Input private key =  %d ", private_key);
-    $display("Input public key =  %d ", public_key);
-    $display("Input message key =  %d ", message_val);
-    $display("Output value =  %d \n\n", Cal_val);
+    start = 1'b1;                 // Start decryption process
+    #10 start = 1'b0;             // De-assert start after 10ns
 
-    //////////////////////////////////////////////
+    #2000;                        // Wait for decryption process to complete
+    $display("Decoding...");      // Display message indicating decoding
+    $display("Input private key = %d", private_key);  // Display input private key
+    $display("Input public key = %d", public_key);    // Display input public key
+    $display("Input message value = %d", message_val); // Display input message
+    $display("Decrypted output value = %d\n\n", Cal_val); // Display decrypted output
 
-    //decrypt
-    private_key = 16'd7;
-    public_key = 16'd33;
-    message_val = 16'd3;
-
-
-    clk=1'b0;
-    rst=1'b1;
-
-
-    #20 rst=1'b0;
-
-    start = 1'b1;
-    #10 start = 1'b0;
-
-    #2000
-     $display("Decoding...");
-    $display("Input private key =  %d ", private_key);
-    $display("Input public key =  %d ", public_key);
-    $display("Input message key =  %d ", message_val);
-    $display("Output value =  %d \n\n", Cal_val);
-    $finish;
+    $finish;                      // End simulation
   end
 
-
-  always  @ (dut.current_state)
+  // Monitor and display the current state of the DUT
+  always @ (dut.current_state)
   begin
-    $display("%0t Current State =  %d \n",$time ,dut.current_state);
+    $display("%0t Current State = %d\n", $time, dut.current_state);
   end
-
-
-
 
 endmodule
