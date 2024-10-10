@@ -22,7 +22,41 @@
 // - The clock signal is generated with a period of 10ns.
 // - Reset is applied at the beginning of both encryption and decryption tests.
 // - Results are displayed using $display for verification of output.
-//
+
+//How RSA parameters were chosen for this example
+
+// 1. Modulus n (public key modulus):
+//    The modulus n is the product of two prime numbers, p and q.
+//    For this example, we assume p = 3 and q = 11, so the modulus n = p * q = 3 * 11 = 33.
+//    The modulus n is part of the public key and is used in both encryption and decryption.
+
+// 2. Euler's totient function φ(n):
+//    φ(n) = (p - 1) * (q - 1), which in this case is φ(33) = (3 - 1) * (11 - 1) = 2 * 10 = 20.
+//    This value is used to determine the private and public exponents (e and d).
+
+// 3. Public exponent e (public key exponent):
+//    The public exponent e must be coprime with φ(n), meaning gcd(e, φ(n)) = 1.
+//    In this example, e = 3 is a small and commonly used value for public exponent, and it's coprime with φ(33) = 20.
+//    This value is used during encryption to raise the message M to the power of e, modulo n.
+
+// 4. Private exponent d (private key):
+//    The private exponent d is the modular inverse of e mod φ(n), which satisfies (e * d) mod φ(n) = 1.
+//    In this case, d = 7, because (3 * 7) mod 20 = 21 mod 20 = 1.
+//    This private exponent is used during decryption to raise the ciphertext C to the power of d, modulo n.
+
+// 5. Message M:
+//    The message M to be encrypted must be smaller than the modulus n.
+//    In this example, M = 9, which fits the requirement M < n (n = 33).
+
+// 6. Encryption formula:
+//    C = M^e mod n
+//    Here, the message M is raised to the power of e (public exponent) and reduced modulo n to obtain the ciphertext C.
+//    For example, C = 9^3 mod 33 = 729 mod 33 = 3.
+
+// 7. Decryption formula:
+//    M = C^d mod n
+//    The ciphertext C is raised to the power of d (private exponent) and reduced modulo n to recover the original message M.
+//    For example, M = 3^7 mod 33 = 2187 mod 33 = 9 (which is the original message).
 //////////////////////////////////////////////////////////////////////////////////
 
 module tb_RSA();
